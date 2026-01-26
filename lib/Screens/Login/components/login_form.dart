@@ -14,12 +14,15 @@ class LoginForm extends StatefulWidget {
 }
 
 class _LoginFormState extends State<LoginForm> {
+  final _formKey = GlobalKey<FormState>();
+
   // Variable to track visibility
   bool _isObscure = true;
 
   @override
   Widget build(BuildContext context) {
     return Form(
+      key: _formKey,
       child: Column(
         children: [
           // --- EMAIL FIELD ---
@@ -28,6 +31,12 @@ class _LoginFormState extends State<LoginForm> {
             textInputAction: TextInputAction.next,
             cursorColor: kPrimaryColor,
             onSaved: (email) {},
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return "Please enter your emails";
+              }
+              return null;
+            },
             decoration: const InputDecoration(
               hintText: "Your email",
               prefixIcon: Padding(
@@ -44,6 +53,15 @@ class _LoginFormState extends State<LoginForm> {
               textInputAction: TextInputAction.done,
               obscureText: _isObscure, // Logic to hide/show
               cursorColor: kPrimaryColor,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return "Please enter your password";
+                }
+                if (value.length < 6) {
+                  return "Password must be at least 6 characters";
+                }
+                return null;
+              },
               decoration: InputDecoration(
                 hintText: "Your password",
                 prefixIcon: const Padding(
@@ -67,7 +85,15 @@ class _LoginFormState extends State<LoginForm> {
           ),
           const SizedBox(height: defaultPadding),
           ElevatedButton(
-            onPressed: () {},
+            onPressed: () {
+              if (_formKey.currentState!.validate()) {
+                _formKey.currentState!.save();
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("Login Success!")),
+                );
+              }
+            },
             child: Text(
               "Login".toUpperCase(),
             ),
