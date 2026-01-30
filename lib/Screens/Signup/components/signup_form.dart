@@ -14,6 +14,8 @@ class SignUpForm extends StatefulWidget {
 }
 
 class _SignUpFormState extends State<SignUpForm> {
+  final _formKey = GlobalKey<FormState>();
+
   // These variables track if the password is hidden (true) or shown (false)
   bool _isObscurePass = true;
   bool _isObscureConfirm = true;
@@ -21,6 +23,7 @@ class _SignUpFormState extends State<SignUpForm> {
   @override
   Widget build(BuildContext context) {
     return Form(
+      key: _formKey,
       child: Column(
         children: [
           // --- EMAIL FIELD ---
@@ -29,6 +32,12 @@ class _SignUpFormState extends State<SignUpForm> {
             textInputAction: TextInputAction.next,
             cursorColor: kPrimaryColor,
             onSaved: (email) {},
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return "Please enter your emails";
+              }
+              return null;
+            },
             decoration: const InputDecoration(
               hintText: "Your email",
               prefixIcon: Padding(
@@ -45,6 +54,13 @@ class _SignUpFormState extends State<SignUpForm> {
               textInputAction: TextInputAction.next,
               obscureText: _isObscurePass, // Uses the variable
               cursorColor: kPrimaryColor,
+              onSaved: (password) {},
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return "Please enter your password";
+                }
+                return null;
+              },
               decoration: InputDecoration(
                 hintText: "Your password",
                 prefixIcon: const Padding(
@@ -99,7 +115,15 @@ class _SignUpFormState extends State<SignUpForm> {
           const SizedBox(height: defaultPadding / 2),
 
           ElevatedButton(
-            onPressed: () {},
+            onPressed: () {
+              if (_formKey.currentState!.validate()) {
+                _formKey.currentState!.save();
+                _formKey.currentState!.reset();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("Sign Up Success!")),
+                );
+              }
+            },
             child: Text("Sign Up".toUpperCase()),
           ),
           const SizedBox(height: defaultPadding),
